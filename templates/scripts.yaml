@@ -23,7 +23,7 @@ data:
     if kubectl get namespace linkerd > /dev/null 2>&1;then
       echo "linkerd namespace already exists . . ."
       linkerd check
-    {{ if .Variables.highAvailability }}
+    {{ if .Values.highAvailability }}
       linkerd upgrade --ha | kubectl apply --prune -l linkerd.io/control-plane-ns=linkerd -f -
     {{ else }}
       linkerd upgrade | kubectl apply --prune -l linkerd.io/control-plane-ns=linkerd -f -
@@ -32,7 +32,7 @@ data:
       # linkerd preflight checks
       linkerd check --pre
       # Install linkerd
-    {{ if .Variables.highAvailability }}
+    {{ if .Values.highAvailability }}
       linkerd install --ha | kubectl apply -f -
     {{ else }}
       linkerd install | kubectl apply -f -
@@ -53,7 +53,7 @@ data:
     chmod +x /usr/local/bin/kubectl
     chmod +x /usr/local/bin/linkerd
 
-    {{ if .Variables.highAvailability }}
+    {{ if .Values.highAvailability }}
     linkerd install --ha --ignore-cluster  | kubectl delete -f -
     {{ else }}
     linkerd install --ignore-cluster  | kubectl delete -f -
