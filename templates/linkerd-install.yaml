@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: install-linkerd
+  namespace: syseleven-linkerd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: linkerd-installer
+  template:
+    metadata:
+      labels:
+        name: linkerd-installer
+      annotations:
+        checksum/scripts: {{ include (print $.Template.BasePath "/scripts.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: syseleven-linkerd
+      initContainers:
+        - name: linkerd-installer
+          image: alpine:3.11.0
+          command:
+            - /install-linkerd.sh
+          volumeMounts:
+            - name: scripts
+              mountPath: /install-linkerd.sh
+              subPath: install-linkerd.sh
+        - name: flagger-installer
+          image: alpine:3.11.0
+          command:
+            - /install-flagger.sh
+          volumeMounts:
+            - name: scripts
+              mountPath: /install-flagger.sh
+              subPath: install-flagger.sh
+      containers:
+        - name: linkerd-waiter
+          image: alpine:3.11.0
+          command:
+            - /bin/sh
+            - -c
+            - |
+              while :; do sleep 1000000000; done
+      volumes:
+        - name: scripts
+          configMap:
+            name: linkerd-installer-scripts
+            defaultMode: 0755

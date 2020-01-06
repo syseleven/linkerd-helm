@@ -1,0 +1,94 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: linkerd-installer-scripts
+  namespace: syseleven-linkerd
+data:
+  install-linkerd.sh: |
+    #!/bin/sh
+
+    set -e
+
+    LINKERD_VERSION="{{ .Values.linkerd_version }}"
+
+    # Install dependencies
+    apk add curl openssl
+    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Cluster.Spec.Version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
+    curl -sL https://github.com/linkerd/linkerd2/releases/download/stable-${LINKERD_VERSION}/linkerd2-cli-stable-${LINKERD_VERSION}-linux -o /usr/local/bin/linkerd
+    chmod +x /usr/local/bin/kubectl
+    chmod +x /usr/local/bin/linkerd
+
+
+    if kubectl get namespace linkerd > /dev/null 2>&1;then
+      echo "linkerd namespace already exists . . ."
+      linkerd check
+    {{ if .Variables.highAvailability }}
+      linkerd upgrade --ha | kubectl apply --prune -l linkerd.io/control-plane-ns=linkerd -f -
+    {{ else }}
+      linkerd upgrade | kubectl apply --prune -l linkerd.io/control-plane-ns=linkerd -f -
+    {{ end }}
+    else
+      # linkerd preflight checks
+      linkerd check --pre
+      # Install linkerd
+    {{ if .Variables.highAvailability }}
+      linkerd install --ha | kubectl apply -f -
+    {{ else }}
+      linkerd install | kubectl apply -f -
+    {{ end }}
+    fi
+
+  uninstall-linkerd.sh: |
+    #!/bin/sh
+
+    set -e
+
+    LINKERD_VERSION="{{ .Values.linkerd_version }}"
+
+    # Install dependencies
+    apk add curl openssl
+    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Cluster.Spec.Version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
+    curl -sL https://github.com/linkerd/linkerd2/releases/download/stable-${LINKERD_VERSION}/linkerd2-cli-stable-${LINKERD_VERSION}-linux -o /usr/local/bin/linkerd
+    chmod +x /usr/local/bin/kubectl
+    chmod +x /usr/local/bin/linkerd
+
+    {{ if .Variables.highAvailability }}
+    linkerd install --ha --ignore-cluster  | kubectl delete -f -
+    {{ else }}
+    linkerd install --ignore-cluster  | kubectl delete -f -
+    {{ end }}
+
+  uninstall-flagger.sh: |
+    #!/bin/sh
+
+    set -e
+
+    FLAGGER_VERSION="{{ .Values.flagger_version }}"
+
+    # Install dependencies
+    apk add curl openssl git
+    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Cluster.Spec.Version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
+    chmod +x /usr/local/bin/kubectl
+    kubectl version
+
+    git clone https://github.com/weaveworks/flagger.git
+    cd flagger && git checkout ${FLAGGER_VERSION} -b ${FLAGGER_VERSION}
+    kubectl delete -k kustomize/linkerd/
+
+  install-flagger.sh: |
+    #!/bin/sh
+
+    set -e
+
+    FLAGGER_VERSION="{{ .Values.flagger_version }}"
+
+    # Install dependencies
+    apk add curl openssl git
+    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Cluster.Spec.Version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
+    chmod +x /usr/local/bin/kubectl
+    kubectl version
+
+    git clone https://github.com/weaveworks/flagger.git
+    cd flagger && git checkout ${FLAGGER_VERSION} -b ${FLAGGER_VERSION}
+    kubectl apply -k kustomize/linkerd/

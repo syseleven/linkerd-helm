@@ -7,12 +7,12 @@ metadata:
   annotations:
     "helm.sh/hook": pre-delete
     "helm.sh/hook-delete-policy": hook-succeeded
-  namespace: syseleven-linkerd-init
+  namespace: syseleven-linkerd
 spec:
   template:
     spec:
       restartPolicy: Never
-      serviceAccountName: syseleven-linkerd-init
+      serviceAccountName: syseleven-linkerd
       initContainers:
         - name: flagger-uninstaller
           image: alpine:3.11.0

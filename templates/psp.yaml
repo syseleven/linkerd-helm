@@ -1,0 +1,26 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: psp:syseleven-linkerd
+  namespace: syseleven-linkerd
+rules:
+  - apiGroups: ['policy']
+    resources: ['podsecuritypolicies']
+    verbs:     ['use']
+    resourceNames:
+      - syseleven-restricted
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: psp:syseleven-linkerd
+  namespace: syseleven-linkerd
+roleRef:
+  kind: Role
+  name: psp:syseleven-linkerd
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: syseleven-linkerd
+    namespace: syseleven-linkerd
