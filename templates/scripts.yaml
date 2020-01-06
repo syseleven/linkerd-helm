@@ -14,7 +14,7 @@ data:
 
     # Install dependencies
     apk add curl openssl
-    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Cluster.Spec.Version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
+    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Values.kubernetes_version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
     curl -sL https://github.com/linkerd/linkerd2/releases/download/stable-${LINKERD_VERSION}/linkerd2-cli-stable-${LINKERD_VERSION}-linux -o /usr/local/bin/linkerd
     chmod +x /usr/local/bin/kubectl
     chmod +x /usr/local/bin/linkerd
@@ -48,7 +48,7 @@ data:
 
     # Install dependencies
     apk add curl openssl
-    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Cluster.Spec.Version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
+    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Values.kubernetes_version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
     curl -sL https://github.com/linkerd/linkerd2/releases/download/stable-${LINKERD_VERSION}/linkerd2-cli-stable-${LINKERD_VERSION}-linux -o /usr/local/bin/linkerd
     chmod +x /usr/local/bin/kubectl
     chmod +x /usr/local/bin/linkerd
@@ -68,7 +68,7 @@ data:
 
     # Install dependencies
     apk add curl openssl git
-    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Cluster.Spec.Version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
+    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Values.kubernetes_version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
     chmod +x /usr/local/bin/kubectl
     kubectl version
 
@@ -85,7 +85,7 @@ data:
 
     # Install dependencies
     apk add curl openssl git
-    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Cluster.Spec.Version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
+    curl -L https://storage.googleapis.com/kubernetes-release/release/v{{ .Values.kubernetes_version }}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl
     chmod +x /usr/local/bin/kubectl
     kubectl version
 
