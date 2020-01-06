@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: syseleven-linkerd
+  labels:
+    syseleven.de/managed: "true"
+    istio-injection: disabled
+    linkerd.io/inject: disabled
+    config.linkerd.io/admission-webhooks: disabled
