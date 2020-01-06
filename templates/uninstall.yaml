@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: uninstall-linkerd
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-delete-policy": hook-succeeded
+  namespace: syseleven-linkerd-init
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: syseleven-linkerd-init
+      initContainers:
+        - name: flagger-uninstaller
+          image: alpine:3.11.0
+          command:
+            - /uninstall-flagger.sh
+          volumeMounts:
+            - name: scripts
+              mountPath: /uninstall-flagger.sh
+              subPath: uninstall-flagger.sh
+        - name: linkerd-uninstaller
+          image: alpine:3.11.0
+          command:
+            - /uninstall-linkerd.sh
+          volumeMounts:
+            - name: scripts
+              mountPath: /uninstall-linkerd.sh
+              subPath: uninstall-linkerd.sh
+      containers:
+        - name: uninstall-finished
+          image: alpine:3.11.0
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo Finished
+      volumes:
+        - name: scripts
+          configMap:
+            name: linkerd-installer-scripts
+            defaultMode: 0755
