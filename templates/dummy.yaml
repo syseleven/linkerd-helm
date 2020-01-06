@@ -1,0 +1,8 @@
+# needed so that installation does not fail
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: linkerd-helm
+  namespace: syseleven-linkerd-init
+data:
+  dummy: "1"
