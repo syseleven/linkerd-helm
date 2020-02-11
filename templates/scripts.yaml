@@ -22,19 +22,15 @@ data:
 
     if kubectl get namespace linkerd > /dev/null 2>&1;then
       echo "linkerd namespace already exists . . ."
-    {{ if and (eq .Capabilities.KubeVersion.Major 1) (lt .Capabilities.KubeVersion.Minor 17) }}
-      linkerd check
-    {{ end }}
+      # linkerd check removed until https://github.com/linkerd/linkerd2/issues/3943 is fixed
     {{ if .Values.highAvailability }}
       linkerd upgrade --ha | kubectl apply --prune -l linkerd.io/control-plane-ns=linkerd -f -
     {{ else }}
       linkerd upgrade | kubectl apply --prune -l linkerd.io/control-plane-ns=linkerd -f -
     {{ end }}
     else
-    {{ if and (eq .Capabilities.KubeVersion.Major 1) (lt .Capabilities.KubeVersion.Minor 17) }}
       # linkerd preflight checks
-      linkerd check --pre
-    {{ end }}
+      # linkerd check --pre removed until https://github.com/linkerd/linkerd2/issues/3943 is fixed
       # Install linkerd
     {{ if .Values.highAvailability }}
       linkerd install --ha | kubectl apply -f -
